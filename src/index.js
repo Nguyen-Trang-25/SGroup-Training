@@ -10,26 +10,26 @@
 //   console.log(`Example app listening on port ${port}`)
 // })
 
-// const user = [
-//     {
-//         id:1,
-//         name: 'Trang',
-//         age: 13,
-//         status: "single"
-//     },
-//     {
-//         id:2,
-//         name: 'Nhun',
-//         age: 17,
-//         status: "single"
-//     },
-//     {
-//         id:3,
-//         name: 'Tran',
-//         age: 14,
-//         status: "single"
-//     }
-// ]
+const user = [
+    {
+        id:1,
+        name: 'Trang',
+        age: 13,
+        status: "single"
+    },
+    {
+        id:2,
+        name: 'Nhun',
+        age: 17,
+        status: "single"
+    },
+    {
+        id:3,
+        name: 'Tran',
+        age: 14,
+        status: "single"
+    }
+]
 // // query : "?" => query pragram
 // //paragram: truyền tham số
 // app.get('/user', (req, res) => {
@@ -50,10 +50,22 @@ const port = 3000;
 
 // Tạo array  users
 
+
+const checkAuthentication = (req,res,next) => {
+    const accessToken = req.headers.authorization;
+    console.log(accessToken !== undefined )
+    if(accessToken) {
+        console.log("middleware to authentication");
+        req.user = accessToken;
+        next()
+    } else {
+        res.send("user chua login")
+    }
+}
+
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req);
     console.log('Query:', req.query);
     console.log('Headers:', req.headers);
     next();
@@ -64,9 +76,9 @@ app.get('/', (req, res) => {
 });
 
 // GET tất cả users
-app.get('/users', (req, res) => {
+app.get('/users',checkAuthentication,  (req, res) => {
     console.log('Query:', req.query);
-    let filteredUsers = [...users];
+    let filteredUsers = [...user];
     if (req.query.name) {
         filteredUsers = filteredUsers.filter(user => user.name.includes(req.query.name));
     }
