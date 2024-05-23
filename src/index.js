@@ -1,50 +1,11 @@
-// const express = require('express')
-// const app = express()
-// const port = 3000
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
-
-// app.listen(port, () => {
-//   console.log(`Example app listening on port ${port}`)
-// })
-
-const user = [
-    {
-        id:1,
-        name: 'Trang',
-        age: 13,
-        status: "single"
-    },
-    {
-        id:2,
-        name: 'Nhun',
-        age: 17,
-        status: "single"
-    },
-    {
-        id:3,
-        name: 'Tran',
-        age: 14,
-        status: "single"
-    }
-]
-// // query : "?" => query pragram
-// //paragram: truyền tham số
-// app.get('/user', (req, res) => {
-//     console.log(req.query)
-//     user.sort((a,b) => b.id - a.id)
-//     res.send(user)
-// })
-// app.get('/user/:id', (req, res) => {
-//     console.log(req.params)
-//     user.filter(user => user.id == parseInt(req.params.id))
-//     res.send(user)
-// })
+let fs = require('fs')
+let data = fs.readFileSync('D:/Sgroup/BE/src/users.json','utf-8')
+let users = JSON.parse(data)
 
 
 const express = require('express');
+const { error } = require('console');
 const app = express();
 const port = 3000;
 
@@ -71,14 +32,15 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    res.send('Day la may cua trang');
-});
+// app.get('/', (req, res) => {
+//     res.send('Day la may cua trang');
+// });
 
 // GET tất cả users
 app.get('/users',checkAuthentication,  (req, res) => {
+    // users = JSON.parse(data)
     console.log('Query:', req.query);
-    let filteredUsers = [...user];
+    let filteredUsers = [...users];
     if (req.query.name) {
         filteredUsers = filteredUsers.filter(user => user.name.includes(req.query.name));
     }
@@ -106,6 +68,7 @@ app.post('/users', (req, res) => {
     };
     console.log(newUser)
     users.push(newUser);
+    fs.writeFileSync('D:/Sgroup/BE/src/users.json',JSON.stringify(users))  
     res.status(201).json(newUser);
 });
 
@@ -117,6 +80,7 @@ app.put('/users/:id', (req, res) => {
     if (userIndex !== -1) {
         users[userIndex] = { id: userId, ...req.body };
         res.json(users[userIndex]);
+        fs.writeFileSync('D:/Sgroup/BE/src/users.json',JSON.stringify(users))  
     } else {
         res.status(404).send('User not found');
     }
@@ -130,14 +94,11 @@ app.delete('/users/:id', (req, res) => {
     if (userIndex !== -1) {
         users.splice(userIndex, 1);
         res.status(204).send();
+        fs.writeFileSync('D:/Sgroup/BE/src/users.json',JSON.stringify(users))  
     } else {
         res.status(404).send('User not found');
     }
 });
-
-app.get('user/ngu',(req,res) => {
-    res.send('Vao day')
-})
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
